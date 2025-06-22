@@ -115,7 +115,7 @@ class Miner(BaseMinerNeuron):
         self.traffic_generators = traffic_generators
         self.machines = machines
 
-        base_path = os.path.expanduser("~/tensorprox/model") 
+        base_path = os.path.expanduser("~/tensorprox_sn91_moat/model") 
         self._model = joblib.load(os.path.join(base_path, "decision_tree.pkl"))
         self._imputer = joblib.load(os.path.join(base_path, "imputer.pkl"))
         self._scaler = joblib.load(os.path.join(base_path, "scaler.pkl"))
@@ -132,6 +132,8 @@ class Miner(BaseMinerNeuron):
             PingSynapse: The updated synapse message.
         """
         logger.debug(f"📧 Ping received from {synapse.dendrite.hotkey}, IP: {synapse.dendrite.ip}.")
+        logger.debug(f"<<<<<<<<<<<<<<<<<<<Synapse Received {synapse}")
+        
 
         try:
             ssh_public_key, ssh_private_key = self.generate_ssh_key_pair()

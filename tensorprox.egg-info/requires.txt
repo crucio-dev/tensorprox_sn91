@@ -1,0 +1,7 @@
+bittensor
+loguru
+aiohttp
+asyncssh
+pydantic
+numpy
+pyroute2

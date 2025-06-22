@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: tensorprox
+Version: 0.1.0
+Requires-Dist: bittensor
+Requires-Dist: loguru
+Requires-Dist: aiohttp
+Requires-Dist: asyncssh
+Requires-Dist: pydantic
+Requires-Dist: numpy
+Requires-Dist: pyroute2
