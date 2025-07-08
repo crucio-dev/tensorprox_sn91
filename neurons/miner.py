@@ -177,7 +177,6 @@ class Miner(BaseMinerNeuron):
         return synapse
 
 
-
     def handle_challenge(self, synapse: ChallengeSynapse) -> ChallengeSynapse:
         """
         Handles challenge requests, including firewall activation and deactivation based on the challenge state.
@@ -512,14 +511,14 @@ class Miner(BaseMinerNeuron):
                 Returns `None` if the prediction fails.
         """
 
-        # Impute missing values
-        sample_data_imputed = self._imputer.transform([sample_data])
+        # # Impute missing values
+        # sample_data_imputed = self._imputer.transform([sample_data])
 
-        # Standardize the sample
-        sample_data_scaled =self._scaler.transform(sample_data_imputed)
+        # # Standardize the sample
+        # sample_data_scaled =self._scaler.transform(sample_data_imputed)
 
         # Predict using the model
-        prediction = self._model.predict(sample_data_scaled)
+        prediction = self._model.predict(sample_data)
 
         return prediction[0] if isinstance(prediction, np.ndarray) and len(prediction) > 0 else None
 
