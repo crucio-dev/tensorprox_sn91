@@ -243,6 +243,10 @@ class Miner(BaseMinerNeuron):
             label_type: `UDP_FLOOD`, `TCP_SYN_FLOOD`, `BENIGN` or None
         """
 
+        print("\n")
+        print(f"Incomming Features: {features}")
+        print("\n")
+
         prediction = self.predict_sample(features)  # Get prediction
         label_type = None
         allowed = True
@@ -546,7 +550,7 @@ class Miner(BaseMinerNeuron):
                 If provided, the function will exit when stop_event is set. Defaults to None.
         """
         
-        logger.info(f"Sniffing packets going to {destination_ip} on interface {iface}")
+        logger.info(f" 🏅🏅🏅 Sniffing packets going to {destination_ip} on interface {iface}")
 
         raw_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
         raw_socket.bind((iface, 0))
@@ -584,14 +588,19 @@ class Miner(BaseMinerNeuron):
                 Returns `None` if the prediction fails.
         """
 
-        # # Impute missing values
-        # sample_data_imputed = self._imputer.transform([sample_data])
+        # Impute missing values
+        sample_data_imputed = self._imputer.transform([sample_data])
 
-        # # Standardize the sample
-        # sample_data_scaled =self._scaler.transform(sample_data_imputed)
+        # Standardize the sample
+        sample_data_scaled =self._scaler.transform(sample_data_imputed)
+
+        print("\n")
+        print(f"✨✨✨ Sample_data at Predict_Sample function: {sample_data}")
+        print("\n")
 
         # Predict using the model
-        prediction = self._model.predict(sample_data)
+        # prediction = self._model.predict(sample_data)
+        prediction = self._model.predict(sample_data_scaled)
 
         return prediction[0] if isinstance(prediction, np.ndarray) and len(prediction) > 0 else None
 
