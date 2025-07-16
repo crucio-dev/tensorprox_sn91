@@ -329,6 +329,11 @@ class Miner(BaseMinerNeuron):
 
 
     def extract_batch_features(self, packet_batch):
+
+        print("\n")
+        print(f"Extracting features packet_batch: {packet_batch}")
+        print("\n")
+
         """
         Extract features from a batch of packets.
         
@@ -337,6 +342,74 @@ class Miner(BaseMinerNeuron):
 
         Returns:
             np.array : output data sample with model input features.
+        """
+
+        """
+        Custom Code:
+         flow_stats = defaultdict(lambda: {
+            "Fwd Packets/s": 0, "Flow Bytes/s": 0,
+            "Packet Length Mean": 0, "Total Backward Packet": 0,
+            "Fwd Packet Length Mean": 0, "Bwd Packets/s": 0,
+            "Packet Length Std": 0, "Total Length of Bwd Packets": 0,
+            "Min Packet Lengt": 0, "Fwd Packet Length Max": 0
+        })
+
+        fwd_packets = 0
+        bwd_packets = 0
+        fwd_bytes = 0
+        bwd_bytes = 0
+        packet_lengths = []
+        fwd_packet_lengths = []
+        bwd_packet_lengths = []
+
+        time_window = self.batch_interval
+
+        for packet_data, protocol in packet_batch:
+            if len(packet_data) < 20:
+                continue
+            
+            ip_header = struct.unpack('!BBHHHBBH4s4s', packet_data[0:20])
+            total_length = ip_header[2]
+            src_ip = socket.inet_ntoa(ip_header[8])
+            dest_ip = socket.inet_ntoa(ip_header[9])
+
+            packet_lengths.append(total_length)
+
+            if dest_ip == KING_OVERLAY_IP:
+                fwd_packets += 1
+                fwd_bytes += total_length
+                fwd_packet_lengths.append(total_length)
+            else:
+                bwd_packets += 1
+                bwd_bytes += total_length
+                bwd_packet_lengths.append(total_length)
+
+        # Calculate rate features
+        fwd_packets_per_sec = fwd_packets / time_window if time_window > 0 else 0
+        bwd_packets_per_sec = bwd_packets / time_window if time_window > 0 else 0
+        flow_bytes_per_sec = (fwd_bytes + bwd_bytes) / time_window if time_window > 0 else 0
+
+        # Calculate packet length statistics
+        packet_length_mean = np.mean(packet_lengths) if packet_lengths else 0
+        packet_length_std = np.std(packet_lengths) if packet_lengths else 0
+        min_packet_length = min(packet_lengths) if packet_lengths else 0
+
+        # Forward packet statistics
+        fwd_packet_length_mean = np.mean(fwd_packet_lengths) if fwd_packet_lengths else 0
+        fwd_packet_length_max = max(fwd_packet_lengths) if fwd_packet_lengths else 0
+
+        # Backward packet statistics
+        total_backward_packets = bwd_packets
+        total_length_bwd_packets = bwd_bytes
+
+        features = np.array([
+            fwd_packets_per_sec, flow_bytes_per_sec, packet_length_mean,
+            total_backward_packets, fwd_packet_length_mean, bwd_packets_per_sec,
+            packet_length_std, total_length_bwd_packets, min_packet_length, fwd_packet_length_max
+        ])
+
+        return features
+
         """
 
         if not packet_batch:
@@ -352,6 +425,7 @@ class Miner(BaseMinerNeuron):
             "source_ip_entropy": 0, "dest_port_entropy": 0
         })
 
+       
         for packet_data, protocol in packet_batch:
             if len(packet_data) < 20:
                 continue
@@ -415,7 +489,6 @@ class Miner(BaseMinerNeuron):
 
         return np.array([tcp_syn_flag_ratio, udp_port_entropy, avg_pkt_size, flow_density, ip_entropy])
     
-
     async def batch_processing_loop(self, iface):
         """
         Process the buffered packets every `batch_interval` seconds.
