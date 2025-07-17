@@ -8,3 +8,4 @@ __pycache__/
 *.sig
 .env.*
 .venv/
+ssh_keys/
