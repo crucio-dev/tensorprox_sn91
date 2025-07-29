@@ -183,6 +183,7 @@ class Miner(BaseMinerNeuron):
         """
 
         logger.debug(f"📧 Ping received from {synapse.dendrite.hotkey}, IP: {synapse.dendrite.ip}.")
+        logger.debug(f"✨ Received the Synaose: {synapse}")
 
         try:
 
@@ -207,7 +208,7 @@ class Miner(BaseMinerNeuron):
             
             # Respond with new PingSynapse 
             synapse.machine_availabilities = machine_config
-            logger.debug(f"⏩ Forwarding Ping synapse with machine details to validator {synapse.dendrite.hotkey} .")
+            logger.debug(f"⏩ Forwarding Ping synapse with machine details to validator {synapse.dendrite.hotkey}, {synapse} .")
             return synapse
 
         except Exception as e:
@@ -237,6 +238,7 @@ class Miner(BaseMinerNeuron):
             logger.debug(f"📧 Synapse received from {synapse.dendrite.hotkey}. Task : {task} | State : {state}.")
 
             if state == "GET_READY":
+                logger.debug("✔ Get ready for mining")
                 interfaces = [f"gre-tgen-{i}" for i in range(self.config["num_tgens"])]
                 if not self.firewall_active:
                     self.firewall_active = True
@@ -305,6 +307,7 @@ class Miner(BaseMinerNeuron):
             destination_ip (str): The destination IP address to filter packets.
             ifaces (list): List of network interfaces to sniff packets on.
         """
+        logger.debug("👀 Entering the run_packet_stream function")
 
         loop = asyncio.new_event_loop()  # Create a new event loop for the sniffing thread
         asyncio.set_event_loop(loop)  # Set the new loop as the current one for this thread
@@ -323,6 +326,8 @@ class Miner(BaseMinerNeuron):
             destination_ip (str): IP address of the King machine (should match GRE peer IP or overlay IP).
             out_iface (str): Interface to send packet from (default: gre-king).
         """
+        logger.debug("👀 Entering the moat_forward_packet function")
+        
         try:
             # Open raw socket for IP
             s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_RAW)
@@ -346,6 +351,7 @@ class Miner(BaseMinerNeuron):
             destination_ip (str): The expected destination IP.
             iface (str): The interface name.
         """
+        logger.debug("👀 Entering the process_packet_stream function")
 
         if len(packet_data) < 20:
             return
@@ -378,6 +384,7 @@ class Miner(BaseMinerNeuron):
         Returns:
             np.array : output data sample with model input features.
         """
+        logger.debug("👀 Entering the extract_batch_features function")
 
         if not packet_batch:
             return None
@@ -460,6 +467,7 @@ class Miner(BaseMinerNeuron):
         """
         Process the buffered packets every `batch_interval` seconds.
         """
+        logger.debug("👀 Entering the batch_processing_loop function")
 
         try:
             while not self.stop_firewall_event.is_set():
@@ -550,6 +558,8 @@ class Miner(BaseMinerNeuron):
                 
                 Returns `None` if the prediction fails.
         """
+        logger.debug("👀 Entering the predict_sample function")
+
 
         # Impute missing values
         sample_data_imputed = self._imputer.transform([sample_data])
